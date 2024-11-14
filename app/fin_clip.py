@@ -19,10 +19,13 @@ srt_chunk_similarity = gr.Slider(minimum=0, maximum=1, step=0.1, label="Clip Sim
 srt_content = gr.Textbox(label="SRT File Content")
 srt_content_with_ts = gr.Textbox(label="SRT File Content with Timestamp", visible=False)
 srt_text_output = gr.Textbox(label="SRT File Output line by line")
-srt_chunk_button = gr.Button("Merge SRT File")
+srt_chunk_button = gr.Button("Go!")
+srt_chunk_stop_btn = gr.Button("Stop")
+srt_length = gr.Textbox(label="SRT File Length")
+srt_length_btn = gr.Button("Get Length")
 
 clip_sys_prompt = gr.Textbox(label="Clip System Prompt")
-clip_usr_prompt = gr.Textbox(label="Clip User Prompt")
+clip_usr_prompt = gr.Textbox(label="Clip User Prompt", value='{}')
 
 clip_button = gr.Button("Clip")
 clip_output_text = gr.Textbox(label="Clip Output")
@@ -36,6 +39,11 @@ def init_chunk_prompt_templates(key, db_path):
     descs, prompts = query_prompt(key, db_path)
     return [gr.Dropdown(descs, interactive=True, type="index"), prompts]
 
+import re
+
+def get_word_count(s):
+    words = re.findall(r'\b\w+\b', s)
+    return len(words)
     
 with gr.Blocks() as demo:
     g_usr_prompt = gr.State('{}')
@@ -58,7 +66,10 @@ with gr.Blocks() as demo:
         with gr.Column():
             srt_explorer.render() 
             srt_content.render()
+            srt_length.render()
+            srt_length_btn.render()
             srt_content_with_ts.render()
+
         with gr.Column(scale=4):
             with gr.Row():
                 with gr.Column(scale=2):
@@ -70,13 +81,16 @@ with gr.Blocks() as demo:
                     srt_chunk_prompt_insert_btn.render()
 
                     
-
-    srt_chunk_button.render()
+    with gr.Row():
+        srt_chunk_button.render()
+        srt_chunk_stop_btn.render()
     
+    srt_length_btn.click(get_word_count, srt_content, srt_length)
     srt_chunk_prompt_templates.select(lambda x,y : y[x], [srt_chunk_prompt_templates, srt_chunk_prompt_tpl_list], srt_chunk_prompt)
     srt_chunk_prompt_insert_btn.click(insert_prompt, [srt_chunk_prompt, srt_chunk_prompt_desc, srt_chunk_prompt_key, g_db_path])
     srt_explorer.change(load_text_from_srt, srt_explorer, [srt_content, srt_content_with_ts])
-    srt_chunk_button.click(run_model,[srt_chunk_prompt, srt_content, llm_model_selected, g_usr_prompt, llm_temperature, llm_context_length, llm_max_tokens], srt_text_output) #system_prompt, full_text, model_select, user_prompt, 
+    s_c_e = srt_chunk_button.click(run_model,[srt_chunk_prompt, srt_content, llm_model_selected, g_usr_prompt, llm_temperature, llm_context_length, llm_max_tokens], srt_text_output) #system_prompt, full_text, model_select, user_prompt, 
+    srt_chunk_stop_btn.click(None, None, None, cancels=[s_c_e])
 # 生成Clip
     with gr.Row():
         with gr.Column():
@@ -87,6 +101,7 @@ with gr.Blocks() as demo:
             clip_usr_prompt.render()
             clip_button.render()
     clip_output_text.render()
+    clip_button.click(run_model,[clip_sys_prompt, srt_text_output, llm_model_selected, clip_usr_prompt, llm_temperature, llm_context_length, llm_max_tokens], clip_output_text)
 
     
 demo.launch(server_name='0.0.0.0', server_port=7777)
