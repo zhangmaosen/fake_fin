@@ -10,11 +10,12 @@ import re
 import os
 import shutil
 import dashscope
-from gradio_streamvideo import StreamVideo
+#from gradio_streamvideo import StreamVideo
 import time
 from http import HTTPStatus
 import asyncio
-from moviepy.editor import *
+from moviepy import VideoFileClip, concatenate_videoclips
+import moviepy
 from pypinyin import lazy_pinyin
 import json
 def load_template_from_json_file(json_file):
