@@ -1,0 +1,31 @@
+{
+  "contract": {
+    "ai": {
+      "meta": {
+        "owner": "",
+        "name": "",
+        "description": "",
+        "version": "",
+        "url": "",
+        "icon": "",
+        "type": "",
+        "tags": []
+      },
+      "prompts_signature": "",
+      "model_weight_signature": "",
+      "model_param": {},
+      "output":"",
+      "signature": ""
+    },
+    "asset":{
+        "code":"",
+        "timestamp":"",
+        "trade":"buy or sell",
+        "price":"",
+        "amount":"",
+        "fee":"",
+        "signature":""
+    },
+    "signature":""
+  }
+}
