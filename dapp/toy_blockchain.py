@@ -4,6 +4,8 @@ from time import time
 from uuid import uuid4
 import requests
 from flask import Flask, request, jsonify
+import signal
+import os
 
 class Blockchain:
     def __init__(self):
@@ -11,8 +13,12 @@ class Blockchain:
         self.chain = []
         self.nodes = set()
 
-        # Create the genesis block
-        self.new_block(previous_hash=1, proof=100)
+        # Try to load existing blockchain data from file
+        self.load_blockchain()
+
+        # If no data is loaded, create the genesis block
+        if not self.chain:
+            self.new_block(previous_hash=1, proof=100)
 
     def new_block(self, proof, previous_hash=None):
         """
@@ -161,7 +167,19 @@ class Blockchain:
             return True
 
         return False
-
+    def load_blockchain(self):
+        """
+        Load the blockchain from a file if it exists.
+        """
+        try:
+            with open('blockchain_data.json', 'r') as file:
+                data = json.load(file)
+                self.chain = data
+                print("Blockchain data loaded from blockchain_data.json")
+        except FileNotFoundError:
+            print("No blockchain data found. Starting with an empty chain.")
+        except json.JSONDecodeError:
+            print("Error decoding blockchain data. Starting with an empty chain.")
 
 app = Flask(__name__)
 
@@ -254,6 +272,28 @@ def consensus():
         }
 
     return jsonify(response), 200
+
+def save_blockchain():
+    """
+    Save the blockchain to a file when the application exits.
+    """
+    with open('blockchain_data.json', 'w') as file:
+        json.dump(blockchain.chain, file, indent=4)
+    print("Blockchain data saved to blockchain_data.json")
+
+def signal_handler(sig, frame):
+    """
+    Signal handler to catch SIGINT and SIGTERM signals.
+    """
+    print("Exiting gracefully...")
+    save_blockchain()
+    os._exit(0)
+
+# Register the signal handler
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
