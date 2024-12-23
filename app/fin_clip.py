@@ -30,7 +30,7 @@ clip_usr_prompt = gr.Textbox(label="Clip User Prompt", value='{}')
 clip_button = gr.Button("Clip")
 clip_output_text = gr.Textbox(label="Clip Output")
 
-llm_model_selected = gr.Dropdown(["llama3.1:70b", "gemma2:9b-instruct-q4_0", "qwen2.5:72b-instruct","qwen2.5:32b-instruct","qwen2.5:7b-instruct"], label="Model", value="qwen2.5:32b-instruct")
+llm_model_selected = gr.Dropdown(["qwen2.5:latest", "qwen2.5:14b"], label="Model", value="qwen2.5:latest")
 llm_context_length = gr.Slider(minimum=0, maximum=30000, step=100, value=20000, label="LLM Context Length")
 llm_temperature = gr.Slider(minimum=0, maximum=1, step=0.1, value=0, label="LLM Temperature")
 llm_max_tokens = gr.Slider(minimum=0, maximum=10000, value=1024, step=1, label="LLM Max Tokens")
@@ -104,4 +104,4 @@ with gr.Blocks() as demo:
     clip_button.click(run_model,[clip_sys_prompt, srt_text_output, llm_model_selected, clip_usr_prompt, llm_temperature, llm_context_length, llm_max_tokens], clip_output_text)
 
     
-demo.launch(server_name='0.0.0.0', server_port=7777)
+demo.launch(server_port=17777)

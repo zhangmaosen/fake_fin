@@ -164,12 +164,3 @@ cython_debug/
 *.wav
 mp3/
 wav/
-node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-/node_modules/
-/storage/
-/tests/
-/tests-examples/
