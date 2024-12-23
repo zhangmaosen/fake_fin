@@ -167,3 +167,5 @@ wav/
 node_modules/
 *.json
 *.jsonp
+
+*.csv
