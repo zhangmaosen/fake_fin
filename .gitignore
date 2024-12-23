@@ -170,3 +170,5 @@ data/
 test_data/
 
 state.json
+*.json
+*.jsonp
